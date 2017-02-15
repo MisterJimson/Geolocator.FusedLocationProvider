@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Widget;
 using Android.OS;
+using GeoFusedLocationProvider;
 
 namespace Sample
 {
@@ -10,9 +11,10 @@ namespace Sample
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            SetContentView(Resource.Layout.Main);
 
-            // Set our view from the "main" layout resource
-            // SetContentView (Resource.Layout.Main);
+            var geo = new FusedLocationGeolocator();
+            geo.StartListeningAsync(5, 5, false);
         }
     }
 }

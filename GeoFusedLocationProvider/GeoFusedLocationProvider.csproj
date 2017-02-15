@@ -93,7 +93,6 @@
   <ItemGroup>
     <Compile Include="FusedLocationGeolocator.cs" />
     <Compile Include="GoogleCallbacks.cs" />
-    <Compile Include="MainApplication.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -33,7 +33,7 @@ namespace GeoFusedLocationProvider
 
         public FusedLocationGeolocator()
         {
-            DesiredAccuracy = 100;
+            DesiredAccuracy = 90;
 
             callbacks = new GoogleCallbacks();
             callbacks.Connected += Connected;
@@ -61,19 +61,23 @@ namespace GeoFusedLocationProvider
                 Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(location.Time)
             };
 
+            System.Diagnostics.Debug.WriteLine($"PositionChanged: {position.Latitude} {position.Longitude}");
             PositionChanged?.Invoke(this, new PositionEventArgs(position));
         }
 
         private void ConnectionSuspended(object sender, int i)
         {
+            System.Diagnostics.Debug.WriteLine($"ConnectionSuspended: {i}");
         }
 
         private void ConnectionFailed(object sender, ConnectionResult connectionResult)
         {
+            System.Diagnostics.Debug.WriteLine($"ConnectionFailed: {connectionResult.ErrorMessage}");
         }
 
         private void Connected(object sender, Bundle bundle)
         {
+            System.Diagnostics.Debug.WriteLine("Connected");
         }
 
         public Task<Position> GetPositionAsync(int timeoutMilliseconds = -1, CancellationToken? token = null, bool includeHeading = false)
@@ -84,7 +88,7 @@ namespace GeoFusedLocationProvider
         public async Task<bool> StartListeningAsync(int minTime, double minDistance, bool includeHeading = false)
         {
             if (!client.IsConnected)
-                client.Connect();
+                await ConnectAsync();
 
             if (!client.IsConnected)
                 return await Task.FromResult(false);
@@ -127,6 +131,17 @@ namespace GeoFusedLocationProvider
                 return LocationRequest.PriorityLowPower;
 
             return LocationRequest.PriorityNoPower;
+        }
+
+        private Task ConnectAsync()
+        {
+            TaskCompletionSource<bool> resultTaskCompletionSource = new TaskCompletionSource<bool>();
+            callbacks.Connected += delegate
+            {
+                resultTaskCompletionSource.SetResult(true);
+            };
+            client.Connect();
+            return resultTaskCompletionSource.Task;
         }
 
         public void Dispose()

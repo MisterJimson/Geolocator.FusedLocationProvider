@@ -123,6 +123,12 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GeoFusedLocationProvider\GeoFusedLocationProvider.csproj">
+      <Project>{bdf58bbe-2252-486f-aaa7-dff3a2c609b4}</Project>
+      <Name>GeoFusedLocationProvider</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
