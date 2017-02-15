@@ -14,12 +14,17 @@ namespace GeoFusedLocationProvider
     public class FusedLocationGeolocator : IGeolocator, IDisposable
     {
         public double DesiredAccuracy { get; set; }
-        public bool IsListening { get; }
-        public bool SupportsHeading { get; }
+        public bool IsListening { get; private set; }
+        public bool SupportsHeading { get; private set; }
         public bool AllowsBackgroundUpdates { get; set; }
         public bool PausesLocationUpdatesAutomatically { get; set; }
-        public bool IsGeolocationAvailable { get; }
-        public bool IsGeolocationEnabled { get; }
+
+        public bool IsGeolocationAvailable =>
+            LocationServices.FusedLocationApi.GetLocationAvailability(client).IsLocationAvailable;
+
+        public bool IsGeolocationEnabled =>
+            LocationServices.FusedLocationApi.GetLocationAvailability(client).IsLocationAvailable;
+
         public event EventHandler<PositionErrorEventArgs> PositionError;
         public event EventHandler<PositionEventArgs> PositionChanged;
 
@@ -44,15 +49,17 @@ namespace GeoFusedLocationProvider
 
         private void LocationChanged(object sender, Location location)
         {
-            var position = new Position();
-            position.Latitude = location.Latitude;
-            position.Longitude = location.Longitude;
-            position.Accuracy = location.Accuracy;
-            position.AltitudeAccuracy = location.Accuracy;
-            position.Altitude = location.Altitude;
-            position.Heading = location.Bearing;
-            position.Speed = location.Speed;
-            position.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(location.Time);
+            var position = new Position
+            {
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Accuracy = location.Accuracy,
+                AltitudeAccuracy = location.Accuracy,
+                Altitude = location.Altitude,
+                Heading = location.Bearing,
+                Speed = location.Speed,
+                Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(location.Time)
+            };
 
             PositionChanged?.Invoke(this, new PositionEventArgs(position));
         }
@@ -92,12 +99,19 @@ namespace GeoFusedLocationProvider
             var result = await LocationServices.FusedLocationApi
                 .RequestLocationUpdatesAsync(client, locationRequest, callbacks);
 
+            if (result.IsSuccess)
+                IsListening = true;
+
             return result.IsSuccess;
         }
 
         public async Task<bool> StopListeningAsync()
         {
             var result = await LocationServices.FusedLocationApi.RemoveLocationUpdatesAsync(client, callbacks);
+
+            if (result.IsSuccess)
+                IsListening = false;
+
             return result.IsSuccess;
         }
 
