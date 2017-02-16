@@ -4,6 +4,8 @@ using Android.App;
 using Android.OS;
 using Android.Runtime;
 using Plugin.CurrentActivity;
+using Plugin.Geolocator.Abstractions;
+using GeoFusedLocationProvider;
 
 namespace Sample
 {
@@ -11,6 +13,8 @@ namespace Sample
     [Application]
     public class MainApplication : Application, Application.IActivityLifecycleCallbacks
     {
+        public static IGeolocator Geolocator;
+
         public MainApplication(IntPtr handle, JniHandleOwnership transer)
           :base(handle, transer)
         {
@@ -21,6 +25,8 @@ namespace Sample
             base.OnCreate();
             RegisterActivityLifecycleCallbacks(this);
             //A great place to initialize Xamarin.Insights and Dependency Services!
+
+            Geolocator = new FusedLocationGeolocator();
         }
 
         public override void OnTerminate()

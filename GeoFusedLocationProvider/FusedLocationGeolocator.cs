@@ -15,21 +15,35 @@ namespace GeoFusedLocationProvider
     {
         public double DesiredAccuracy { get; set; }
         public bool IsListening { get; private set; }
-        public bool SupportsHeading { get; private set; }
+        public bool SupportsHeading => true;
         public bool AllowsBackgroundUpdates { get; set; }
         public bool PausesLocationUpdatesAutomatically { get; set; }
 
-        public bool IsGeolocationAvailable =>
-            LocationServices.FusedLocationApi.GetLocationAvailability(client).IsLocationAvailable;
+        public bool IsGeolocationAvailable
+        {
+            get
+            {
+                if (client != null && client.IsConnected)
+                {
+                    var avalibility = LocationServices.FusedLocationApi.GetLocationAvailability(client);
+                    if (avalibility != null)
+                        return avalibility.IsLocationAvailable;
+                }
 
-        public bool IsGeolocationEnabled =>
-            LocationServices.FusedLocationApi.GetLocationAvailability(client).IsLocationAvailable;
+                return IsLocationServicesEnabled();
+            }
+        }
+
+        public bool IsGeolocationEnabled => IsLocationServicesEnabled();
+        
 
         public event EventHandler<PositionErrorEventArgs> PositionError;
         public event EventHandler<PositionEventArgs> PositionChanged;
 
         private GoogleCallbacks callbacks;
         private GoogleApiClient client;
+
+        private Position LastPosition;
 
         public FusedLocationGeolocator()
         {
@@ -45,6 +59,8 @@ namespace GeoFusedLocationProvider
                 new GoogleApiClient.Builder(Application.Context, callbacks, callbacks)
                 .AddApi(LocationServices.API)
                 .Build();
+
+            client.Connect();
         }
 
         private void LocationChanged(object sender, Location location)
@@ -61,6 +77,7 @@ namespace GeoFusedLocationProvider
                 Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(location.Time)
             };
 
+            LastPosition = position;
             System.Diagnostics.Debug.WriteLine($"PositionChanged: {position.Latitude} {position.Longitude}");
             PositionChanged?.Invoke(this, new PositionEventArgs(position));
         }
@@ -80,9 +97,31 @@ namespace GeoFusedLocationProvider
             System.Diagnostics.Debug.WriteLine("Connected");
         }
 
-        public Task<Position> GetPositionAsync(int timeoutMilliseconds = -1, CancellationToken? token = null, bool includeHeading = false)
+        public async Task<Position> GetPositionAsync(int timeoutMilliseconds = -1, CancellationToken? cancelToken = null, bool includeHeading = false)
         {
-            throw new NotImplementedException();
+            if (timeoutMilliseconds <= 0 && timeoutMilliseconds != Timeout.Infinite)
+                throw new ArgumentOutOfRangeException("timeoutMilliseconds", "timeout must be greater than or equal to 0");
+
+            if (!cancelToken.HasValue)
+                cancelToken = CancellationToken.None;
+
+            if (IsListening)
+            {
+                if (LastPosition != null)
+                    return LastPosition;
+                else
+                    return await NextLocationAsync();
+            }
+            else
+            {
+                var nextLocation = NextLocationAsync();
+                var startListening = StartListeningAsync(500, 10);
+
+                await startListening;
+                var position = await nextLocation;
+                await StopListeningAsync();
+                return position;
+            }
         }
 
         public async Task<bool> StartListeningAsync(int minTime, double minDistance, bool includeHeading = false)
@@ -135,13 +174,63 @@ namespace GeoFusedLocationProvider
 
         private Task ConnectAsync()
         {
-            TaskCompletionSource<bool> resultTaskCompletionSource = new TaskCompletionSource<bool>();
-            callbacks.Connected += delegate
+            TaskCompletionSource<bool> connectionSource = new TaskCompletionSource<bool>();
+            EventHandler<Bundle> handler = null;
+
+            handler = (sender, args) =>
             {
-                resultTaskCompletionSource.SetResult(true);
+                callbacks.Connected -= handler;
+                connectionSource.SetResult(true);
             };
+
+            callbacks.Connected += handler;
             client.Connect();
-            return resultTaskCompletionSource.Task;
+            return connectionSource.Task;
+        }
+
+        private Task<Position> NextLocationAsync()
+        {
+            TaskCompletionSource<Position> locationSource = new TaskCompletionSource<Position>();
+            EventHandler<PositionEventArgs> handler = null;
+
+            handler = (sender, args) =>
+            {
+                this.PositionChanged -= handler;
+                locationSource.SetResult(args.Position);
+            };
+
+            this.PositionChanged += handler;
+            return locationSource.Task;
+        }
+
+        private bool IsLocationServicesEnabled()
+        {
+            int locationMode = 0;
+            string locationProviders;
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+            {
+                try
+                {
+                    locationMode = Android.Provider.Settings.Secure.GetInt(
+                        Application.Context.ContentResolver, 
+                        Android.Provider.Settings.Secure.LocationMode);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+
+                return locationMode != (int)Android.Provider.SecurityLocationMode.Off;
+            }
+            else
+            {
+                locationProviders = Android.Provider.Settings.Secure.GetString(
+                    Application.Context.ContentResolver,
+                    Android.Provider.Settings.Secure.LocationProvidersAllowed);
+
+                return !string.IsNullOrEmpty(locationProviders);
+            }
         }
 
         public void Dispose()
