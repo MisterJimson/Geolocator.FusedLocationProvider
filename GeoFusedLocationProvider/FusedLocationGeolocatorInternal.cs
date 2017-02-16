@@ -11,7 +11,7 @@ using Plugin.Geolocator.Abstractions;
 
 namespace GeoFusedLocationProvider
 {
-    public class FusedLocationGeolocator : IGeolocator, IDisposable
+    internal class FusedLocationGeolocatorInternal : IGeolocator, IDisposable
     {
         public double DesiredAccuracy { get; set; }
         public bool IsListening { get; private set; }
@@ -35,7 +35,6 @@ namespace GeoFusedLocationProvider
         }
 
         public bool IsGeolocationEnabled => IsLocationServicesEnabled();
-        
 
         public event EventHandler<PositionErrorEventArgs> PositionError;
         public event EventHandler<PositionEventArgs> PositionChanged;
@@ -45,7 +44,7 @@ namespace GeoFusedLocationProvider
 
         private Position LastPosition;
 
-        public FusedLocationGeolocator()
+        public FusedLocationGeolocatorInternal()
         {
             DesiredAccuracy = 90;
 
