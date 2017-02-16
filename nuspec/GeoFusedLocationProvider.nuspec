@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Mj.GeoFusedLocationProvider</id>
+        <version>1.0.0</version>
+        <title>Mj.GeoFusedLocationProvider</title>
+        <summary>Fused Location Api for GeolocatorPlugin</summary>
+        <description>
+          Fused Location Api for GeolocatorPlugin
+
+          This is a Xamarin Android library with a secondary implementation of IGeolocator using the FusedLocationProviderApi.
+        </description>
+        <authors>Jason Rai</authors>
+        <owners>Jason Rai</owners>
+        <licenseUrl>https://github.com/MisterJimson/Geolocator.FusedLocationProvider/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/MisterJimson/Geolocator.FusedLocationProvider</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <tags>location android gps GeolocatorPlugin FusedLocationProvider</tags>
+        <dependencies>
+            <dependency id="Xam.Plugin.Geolocator" version="[3.0.4, 4)" />
+            <dependency id="Xamarin.GooglePlayServices.Location" version="32.961.0" />
+        </dependencies>
+        <releaseNotes>
+1.0.0
+Initial Release
+        </releaseNotes>
+    </metadata>
+    <files>
+        <file src="..\GeoFusedLocationProvider\bin\Release\GeoFusedLocationProvider.*" 
+              target="lib\MonoAndroid10" />
+    </files>
+</package>
