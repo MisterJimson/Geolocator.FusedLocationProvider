@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Mj.GeoFusedLocationProvider</id>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <title>Mj.GeoFusedLocationProvider</title>
         <summary>Fused Location Api for GeolocatorPlugin</summary>
         <description>
@@ -21,6 +21,9 @@
             <dependency id="Xamarin.GooglePlayServices.Location" version="32.961.0" />
         </dependencies>
         <releaseNotes>
+1.1.0
+Auto fallback if Play Services is not installed
+
 1.0.0
 Initial Release
         </releaseNotes>
