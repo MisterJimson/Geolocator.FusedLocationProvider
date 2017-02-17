@@ -12,33 +12,51 @@ namespace Sample
     {
         IGeolocator geolocator = MainApplication.Geolocator;
 
+        private TextView isGeolocationAvailable;
+        private TextView isGeolocationEnabled;
+        private TextView isListening;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.Main);
 
-            FindViewById<TextView>(Resource.Id.isGeolocationAvailable).Text = geolocator.IsGeolocationAvailable.ToString();
-            FindViewById<TextView>(Resource.Id.isGeolocationEnabled).Text = geolocator.IsGeolocationEnabled.ToString();
+            isGeolocationAvailable = FindViewById<TextView>(Resource.Id.isGeolocationAvailable);
+            isGeolocationEnabled = FindViewById<TextView>(Resource.Id.isGeolocationEnabled);
+            isListening = FindViewById<TextView>(Resource.Id.isListening);
+
             FindViewById<Button>(Resource.Id.start).Click += Start;
             FindViewById<Button>(Resource.Id.stop).Click += Stop;
             FindViewById<Button>(Resource.Id.getpos).Click += GetPos;
 
             geolocator.PositionChanged += GeolocatorOnPositionChanged;
+
+            SetValues();
+         }
+
+        private void SetValues()
+        {
+            isGeolocationAvailable.Text = $"Geolocation Available: {geolocator.IsGeolocationAvailable}";
+            isGeolocationEnabled.Text = $"Geolocation Enabled: {geolocator.IsGeolocationEnabled}";
+            isListening.Text = $"Listening: {geolocator.IsListening}";
         }
 
-        private void GetPos(object sender, EventArgs eventArgs)
+        private async void GetPos(object sender, EventArgs eventArgs)
         {
-            geolocator.GetPositionAsync();
+            await geolocator.GetPositionAsync();
+            SetValues();
         }
 
-        private void Stop(object sender, EventArgs eventArgs)
+        private async void Stop(object sender, EventArgs eventArgs)
         {
-            geolocator.StopListeningAsync();
+            await geolocator.StopListeningAsync();
+            SetValues();
         }
 
-        private void Start(object sender, EventArgs eventArgs)
+        private async void Start(object sender, EventArgs eventArgs)
         {
-            geolocator.StartListeningAsync(500, 100);
+            await geolocator.StartListeningAsync(0, 0);
+            SetValues();
         }
 
         private void GeolocatorOnPositionChanged(object sender, PositionEventArgs positionEventArgs)

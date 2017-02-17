@@ -199,8 +199,8 @@ namespace Sample
 			// aapt resource value: 0x7f070007
 			public const int dark = 2131165191;
 			
-			// aapt resource value: 0x7f07000e
-			public const int getpos = 2131165198;
+			// aapt resource value: 0x7f07000f
+			public const int getpos = 2131165199;
 			
 			// aapt resource value: 0x7f070003
 			public const int icon_only = 2131165187;
@@ -212,7 +212,10 @@ namespace Sample
 			public const int isGeolocationEnabled = 2131165193;
 			
 			// aapt resource value: 0x7f07000b
-			public const int lastPosition = 2131165195;
+			public const int isListening = 2131165195;
+			
+			// aapt resource value: 0x7f07000c
+			public const int lastPosition = 2131165196;
 			
 			// aapt resource value: 0x7f070008
 			public const int light = 2131165192;
@@ -223,11 +226,11 @@ namespace Sample
 			// aapt resource value: 0x7f070004
 			public const int standard = 2131165188;
 			
-			// aapt resource value: 0x7f07000c
-			public const int start = 2131165196;
-			
 			// aapt resource value: 0x7f07000d
-			public const int stop = 2131165197;
+			public const int start = 2131165197;
+			
+			// aapt resource value: 0x7f07000e
+			public const int stop = 2131165198;
 			
 			// aapt resource value: 0x7f070005
 			public const int wide = 2131165189;

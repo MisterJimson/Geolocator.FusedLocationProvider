@@ -26,7 +26,7 @@ namespace Sample
             RegisterActivityLifecycleCallbacks(this);
             //A great place to initialize Xamarin.Insights and Dependency Services!
 
-            Geolocator = new FusedLocationGeolocatorInternal();
+            Geolocator = new FusedLocationGeolocator();
         }
 
         public override void OnTerminate()

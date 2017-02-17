@@ -2,32 +2,47 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-  <TextView
-    android:id="@+id/isGeolocationEnabled"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"/>
-  <TextView
-    android:id="@+id/isGeolocationAvailable"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"/>
-  <TextView
-    android:id="@+id/lastPosition"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"/>
-  <Button
-    android:id="@+id/start"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:text="Start Listening"/>
-  <Button
-    android:id="@+id/stop"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:text="Stop Listening"/>
-  <Button
-    android:id="@+id/getpos"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:text="Get Position"/>
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/isGeolocationEnabled"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <TextView
+        android:id="@+id/isGeolocationAvailable"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <TextView
+        android:id="@+id/isListening"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <TextView
+        android:id="@+id/lastPosition"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content">
+        <Button
+            android:id="@+id/start"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Start Listening" />
+        <Button
+            android:id="@+id/stop"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Stop Listening" />
+        <Button
+            android:id="@+id/getpos"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Get Position" />
+    </LinearLayout>
 </LinearLayout>

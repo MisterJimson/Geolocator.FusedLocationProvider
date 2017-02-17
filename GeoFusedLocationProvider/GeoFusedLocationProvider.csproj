@@ -91,10 +91,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FusedLocationGeolocator.cs" />
     <Compile Include="FusedLocationGeolocatorInternal.cs" />
     <Compile Include="GoogleCallbacks.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
