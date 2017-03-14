@@ -44,7 +44,8 @@ namespace GeoFusedLocationProvider
 
         public void OnLocationChanged(Location location)
         {
-            LocationChanged?.Invoke(this, location);
+            if (!(location.Latitude == 0.0 && location.Longitude == 0.0))
+                LocationChanged?.Invoke(this, location);
         }
     }
 }
