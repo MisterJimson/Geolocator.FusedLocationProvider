@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -8,6 +9,7 @@ using Android.Gms.Location;
 using Android.Locations;
 using Android.OS;
 using Plugin.Geolocator.Abstractions;
+using Address = Plugin.Geolocator.Abstractions.Address;
 
 namespace GeoFusedLocationProvider
 {
@@ -16,8 +18,6 @@ namespace GeoFusedLocationProvider
         public double DesiredAccuracy { get; set; }
         public bool IsListening { get; private set; }
         public bool SupportsHeading => true;
-        public bool AllowsBackgroundUpdates { get; set; }
-        public bool PausesLocationUpdatesAutomatically { get; set; }
 
         public bool IsGeolocationAvailable
         {
@@ -96,13 +96,15 @@ namespace GeoFusedLocationProvider
             System.Diagnostics.Debug.WriteLine("Connected");
         }
 
-        public async Task<Position> GetPositionAsync(int timeoutMilliseconds = -1, CancellationToken? cancelToken = null, bool includeHeading = false)
+        public Task<Position> GetLastKnownLocationAsync()
         {
-            if (timeoutMilliseconds <= 0 && timeoutMilliseconds != Timeout.Infinite)
-                throw new ArgumentOutOfRangeException("timeoutMilliseconds", "timeout must be greater than or equal to 0");
+            return Task.FromResult(LastPosition);
+        }
 
-            if (!cancelToken.HasValue)
-                cancelToken = CancellationToken.None;
+        public async Task<Position> GetPositionAsync(TimeSpan? timeout = null, CancellationToken? token = null, bool includeHeading = false)
+        {
+            if (!token.HasValue)
+                token = CancellationToken.None;
 
             if (IsListening)
             {
@@ -114,7 +116,7 @@ namespace GeoFusedLocationProvider
             else
             {
                 var nextLocation = NextLocationAsync();
-                var startListening = StartListeningAsync(500, 10);
+                var startListening = StartListeningAsync(TimeSpan.FromSeconds(5), 10, includeHeading);
 
                 await startListening;
                 var position = await nextLocation;
@@ -123,7 +125,12 @@ namespace GeoFusedLocationProvider
             }
         }
 
-        public async Task<bool> StartListeningAsync(int minTime, double minDistance, bool includeHeading = false)
+        public Task<IEnumerable<Address>> GetAddressesForPositionAsync(Position position, string mapKey = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> StartListeningAsync(TimeSpan minimumTime, double minimumDistance, bool includeHeading = false, ListenerSettings listenerSettings = null)
         {
             if (!client.IsConnected)
                 await ConnectAsync();
@@ -132,10 +139,10 @@ namespace GeoFusedLocationProvider
                 return await Task.FromResult(false);
 
             var locationRequest = new LocationRequest();
-            locationRequest.SetSmallestDisplacement(Convert.ToInt64(minDistance))
-                .SetFastestInterval(minTime)
-                .SetInterval(minTime * 3)
-                .SetMaxWaitTime(minTime * 6)
+            locationRequest.SetSmallestDisplacement(Convert.ToInt64(minimumDistance))
+                .SetFastestInterval(minimumTime.Milliseconds)
+                .SetInterval(minimumTime.Milliseconds * 3)
+                .SetMaxWaitTime(minimumTime.Milliseconds * 6)
                 .SetPriority(GetPriority());
 
             var result = await LocationServices.FusedLocationApi

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Plugin.Geolocator;
@@ -22,19 +23,29 @@ namespace GeoFusedLocationProvider
             }
         }
 
-        public Task<Position> GetPositionAsync(int timeoutMilliseconds = -1, CancellationToken? token = null, bool includeHeading = false)
+        public Task<Position> GetPositionAsync(TimeSpan? timeout = null, CancellationToken? token = null, bool includeHeading = false)
         {
-            return bestGeolocator.GetPositionAsync(timeoutMilliseconds, token, includeHeading);
+            return bestGeolocator.GetPositionAsync(timeout, token, includeHeading);
         }
 
-        public Task<bool> StartListeningAsync(int minTime, double minDistance, bool includeHeading = false)
+        public Task<bool> StartListeningAsync(TimeSpan minimumTime, double minimumDistance, bool includeHeading = false, ListenerSettings listenerSettings = null)
         {
-            return bestGeolocator.StartListeningAsync(minTime, minDistance, includeHeading);
+            return bestGeolocator.StartListeningAsync(minimumTime, minimumDistance, includeHeading, listenerSettings);
         }
 
         public Task<bool> StopListeningAsync()
         {
             return bestGeolocator.StopListeningAsync();
+        }
+
+        public Task<Position> GetLastKnownLocationAsync()
+        {
+            return bestGeolocator.GetLastKnownLocationAsync();
+        }
+
+        public Task<IEnumerable<Address>> GetAddressesForPositionAsync(Position position, string mapKey = null)
+        {
+            return bestGeolocator.GetAddressesForPositionAsync(position, mapKey);
         }
 
         public double DesiredAccuracy
@@ -51,18 +62,6 @@ namespace GeoFusedLocationProvider
         public bool SupportsHeading
         {
             get { return bestGeolocator.SupportsHeading; }
-        }
-
-        public bool AllowsBackgroundUpdates
-        {
-            get { return bestGeolocator.AllowsBackgroundUpdates; }
-            set { bestGeolocator.AllowsBackgroundUpdates = value; }
-        }
-
-        public bool PausesLocationUpdatesAutomatically
-        {
-            get { return bestGeolocator.PausesLocationUpdatesAutomatically; }
-            set { bestGeolocator.PausesLocationUpdatesAutomatically = value; }
         }
 
         public bool IsGeolocationAvailable

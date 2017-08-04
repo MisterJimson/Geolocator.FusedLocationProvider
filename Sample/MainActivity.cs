@@ -55,7 +55,7 @@ namespace Sample
 
         private async void Start(object sender, EventArgs eventArgs)
         {
-            await geolocator.StartListeningAsync(0, 0);
+            await geolocator.StartListeningAsync(TimeSpan.FromSeconds(1), 0);
             SetValues();
         }
 
